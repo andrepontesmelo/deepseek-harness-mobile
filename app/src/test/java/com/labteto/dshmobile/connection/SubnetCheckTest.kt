@@ -42,4 +42,17 @@ class SubnetCheckTest {
     fun `a device with no ipv4 makes no claim`() {
         assertTrue(sameSubnet("192.168.1.20", emptyList()))
     }
+
+    /** Tailscale/CGNAT (100.64/10) is a routed overlay, not a LAN — peers on different /24s route fine. */
+    @Test
+    fun `a tailscale peer is accepted when the device is on the tailnet`() {
+        assertTrue(sameSubnet("100.95.1.5", listOf("192.168.1.44", "100.110.253.114")))
+        assertTrue(sameSubnet("100.64.0.1", listOf("100.127.255.250")))
+    }
+
+    @Test
+    fun `a tailscale address is still rejected off the tailnet`() {
+        assertFalse(sameSubnet("100.95.1.5", listOf("192.168.1.44")))
+        assertFalse(sameSubnet("192.168.1.20", listOf("100.110.253.114")))
+    }
 }

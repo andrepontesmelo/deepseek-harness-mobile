@@ -35,21 +35,28 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Whether [target] sits in the same /24 as any of [localIps].
+ * Whether [target] is reachable from this device's own addresses.
  *
  * Free function so it is testable without a device: the sweep only ever looks at the phone's own
  * /24, so an address outside it can be rejected instantly with a message that also explains why
  * scanning found nothing. A non-literal host (a name) is not judged here — it cannot be.
+ *
+ * Exception: Tailscale/CGNAT space (100.64.0.0/10) is a routed overlay, not a LAN — two tailnet
+ * peers almost never share a /24, yet route to each other fine. So a CGNAT target is accepted
+ * whenever the phone itself holds any CGNAT address.
  */
 internal fun sameSubnet(target: String, localIps: List<String>): Boolean {
-    val targetParts = target.split('.')
-    if (targetParts.size != 4 || targetParts.any { part -> part.toIntOrNull()?.takeIf { it in 0..255 } == null }) {
-        return true // Not an IPv4 literal — nothing to compare, so do not claim a mismatch.
-    }
+    val targetParts = target.split('.').map { it.toIntOrNull()?.takeIf { n -> n in 0..255 } ?: return true }
     if (localIps.isEmpty()) return true
+    if (targetParts.isCgnat() && localIps.any { it.split('.').isCgnatParts() }) return true
     val targetPrefix = targetParts.take(3)
-    return localIps.any { it.split('.').take(3) == targetPrefix }
+    return localIps.any { it.split('.').take(3) == targetPrefix.map(Int::toString) }
 }
+
+private fun List<Int>.isCgnat(): Boolean = size == 4 && this[0] == 100 && this[1] in 64..127
+
+private fun List<String>.isCgnatParts(): Boolean =
+    size == 4 && this[0] == "100" && (this[1].toIntOrNull() ?: -1) in 64..127
 
 /**
  * Finds DeepSeek Harness instances on the local Wi-Fi.
