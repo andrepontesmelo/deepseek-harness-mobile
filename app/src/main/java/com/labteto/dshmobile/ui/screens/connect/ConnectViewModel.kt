@@ -499,6 +499,19 @@ class ConnectViewModel @Inject constructor(
                 config = paired,
             )
             if (outcome !is ProbeOutcome.Reachable) {
+                // 401 still names a harness worth remembering: without a stored host the
+                // Sign in dialog has nothing to exchange the token against (NoHost).
+                if (outcome is ProbeOutcome.Unauthenticated) {
+                    hostsStore.addKnownPort(portInt)
+                    hostsStore.rememberHost(
+                        name = hostLabel(input.host),
+                        host = input.host,
+                        port = portInt,
+                        isLoopback = isLoopback,
+                        useTls = useTls,
+                        description = null,
+                    )
+                }
                 fail(ConnectFailure.from(outcome, relay = paired != null), authority)
                 return@launch
             }
