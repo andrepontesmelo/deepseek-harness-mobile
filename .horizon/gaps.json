@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "revision": 5,
+  "gaps": [
+    {
+      "id": "nested-workspace-baseline",
+      "text": "Workspace/follow baseline must decode the 0.1.2 nested value shape and never silently wipe workspaces",
+      "added_at": "2026-09-23T23:23:47Z",
+      "provenance": {
+        "harness": "unknown",
+        "session_id": "unknown",
+        "tty": false,
+        "origin": "agent-proposed"
+      },
+      "details": "Evidence: main's WorkspaceFollowFrame.Baseline decodes flat top-level keys (core SessionHistoryDtos.kt:370-375) while the sibling session-control baseline in the same file nests under value (:278-280); with ignoreUnknownKeys (JsonRpc.kt:19-20) a 0.1.2 host's {type:baseline, value:{items, archivedSessionIds}} decodes to empty and SessionStore.kt:776-783 then clears all workspaces on every connect. A tested fast-forwardable fix exists unlanded on branch fix/workspace-baseline-nested-value (commit eb84328, +13 code +34 test WorkspaceFollowBaselineTest.kt). Mock-harness implements no workspace/follow baseline, so the gate pins neither shape. Done: nested decode landed on main (merge eb84328 or equivalent), round-trip pin test green in the CI gate, and mock-harness serves a baseline fixture so the shape stays pinned."
+    },
+    {
+      "id": "real-harness-012-conformance",
+      "text": "0.1.2 protocol migration verified against a real harness and device, not only mock replay",
+      "added_at": "2026-09-23T23:23:47Z",
+      "provenance": {
+        "harness": "unknown",
+        "session_id": "unknown",
+        "tty": false,
+        "origin": "agent-proposed"
+      },
+      "details": "Evidence: 286f26e commit body - \"Not yet verified against a real 0.1.2 harness or a device; tools/capture is re-pointed for that\"; no in-repo record the capture run happened. Upstream has since moved to dsh-v0.1.7-rc.1 tags, so unverifiable drift is growing. App-side conformance is only evidenced by its own test suite + CHANGELOG narrative. Done: a capture from a live 0.1.2 host replayed as a golden test, or a documented manual verification note (docs/ or CHANGELOG) naming harness version, device, and date."
+    },
+    {
+      "id": "pairing-vm-testability",
+      "text": "Pairing regression class (latched 401 signal) covered by a real test",
+      "added_at": "2026-09-23T23:23:47Z",
+      "provenance": {
+        "harness": "unknown",
+        "session_id": "unknown",
+        "tty": false,
+        "origin": "agent-proposed"
+      },
+      "details": "Evidence: 391f4f9 commit body - the Sign-in reopen bug was \"not covered by a test - PairViewModel needs five injected dependencies including an Android Context, and this module has no mocking or Robolectric dependency\". Nothing added since. Done: a unit test in :app's gate that constructs PairViewModel (Robolectric or injected fakes) and fails on the latched-signal bug class."
+    },
+    {
+      "id": "doc-security-posture-sync",
+      "text": "Security docs describe the current 0.1.2 token-auth posture instead of the pre-0.1.2 loopback-only one",
+      "added_at": "2026-09-23T23:23:47Z",
+      "provenance": {
+        "harness": "unknown",
+        "session_id": "unknown",
+        "tty": false,
+        "origin": "agent-proposed"
+      },
+      "details": "Evidence: harness/README.md:3-4 \"no authentication of any kind\" and :182-184 \"stay loopback-only by design\" contradict the shipped 0.1.2 launch-token flow (HarnessSessionStore.kt:21-56 token-to-cookie exchange, connect_mode_lan_hint strings.xml:391, COMPATIBILITY.md:118-156). docs/SECURITY.md:23 \"There are no tokens, cookies, or TLS\" is stale, and its promised banner (:34-35) is the dead string connect_security_banner (strings.xml:54, zero Kotlin refs; ConnectScreen.kt:141 uses connect_mode_lan_hint). SettingsScreen.kt:185-188 also renders settings_readonly_banner unconditionally although post-0.1.2 authenticated callers reach the full API. Done: harness/README + SECURITY.md LAN sections rewritten to the token posture, dead banner string removed, settings banner conditional or removed, gate green."
+    }
+  ],
+  "closed_ids": [],
+  "about": "DSH Mobile — unofficial Android (Kotlin + Jetpack Compose) companion app for the DeepSeek Harness: drive sessions, review plans/goals, answer approvals, get notified; pairs with dsh-relay for authenticated remote access"
+}
