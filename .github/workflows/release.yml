@@ -35,6 +35,9 @@ jobs:
       - name: Unit tests
         run: ./gradlew :core:test :mock-harness:test :app:testReleaseUnitTest --stacktrace
 
+      - name: Lint
+        run: ./gradlew :app:lintRelease --stacktrace
+
       - name: Build release APK
         env:
           DSH_KEYSTORE: ${{ runner.temp }}/release.keystore
