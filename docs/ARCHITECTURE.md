@@ -36,12 +36,12 @@ app/            Android UI
                   projections, approvals/questions, subagent catalog
   notify/       NotificationObserver — classifier → channels, dedup,
                   deep links
-  media/        AttachmentImages — LruCache + BitmapFactory decoding of
-                  session attachments (no image library: the bytes arrive
-                  through session.attachment, not a URL)
   ui/           theme (exact DSH design tokens + motion specs), components
                   (buttons, disclosure rows, state dots, tool cards,
                   markdown, overlays, bottom sheets, context meter),
+                  media (AttachmentImages — LruCache + BitmapFactory
+                  decoding of session attachments, no image library: the
+                  bytes arrive through session.attachment, not a URL),
                   screens (connect, main shell with Discord-style drawer +
                   details panel, chat, settings)
 
@@ -57,8 +57,9 @@ tools/capture/  Node recorder of real harness traffic → conformance fixtures
 
 ## Data flow
 
-1. `ConnectionManager` performs the readiness handshake and pumps the two
-   WebSocket downlinks; frames fan out as SharedFlows.
+1. `ConnectionManager` performs the readiness handshake over the single
+   bidirectional `/api/remote.mux` WebSocket and pumps its `$events` stream;
+   frames fan out as SharedFlows.
 2. `SessionStore` folds session events into `ConversationSnapshot`s
    (incremental) from that session's session/follow stream, keeps the
    workspace registry from workspace/follow, and merges queue/jobs/
