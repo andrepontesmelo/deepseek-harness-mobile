@@ -105,7 +105,7 @@ so the app reports it as a changed key and refuses to proceed on its own.
 The harness itself never serves TLS, but the app can reach one behind a
 reverse proxy that does (Caddy at `https://agent.home`, say). Typing
 `https://…` into the connect screen — or a bare address with port 443 —
-makes the whole connection TLS: every `/api` call, both event streams, and
+makes the whole connection TLS: every `/api` call, the event stream, and
 session-log downloads.
 
 Certificate verification is standard Android, with one addition:

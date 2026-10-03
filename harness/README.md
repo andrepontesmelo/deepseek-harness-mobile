@@ -179,9 +179,12 @@ ipconfig getifaddr en0        # macOS (Wi-Fi)
   harness while it binds `0.0.0.0`. Only use LAN mode on networks you trust, and
   prefer the relay described at the top of this page.
   See [../docs/SECURITY.md](../docs/SECURITY.md).
-- **Privileged features**: settings, credentials, host directory pickers and
-  agent-preset authoring stay loopback-only by design; the app shows them
-  read-only with a banner when connected over the network.
+- **Privileged features**: nothing is loopback-only any more. Harness 0.1.2
+  deleted that method tier for one uniform rule — whoever reaches the harness
+  gets settings, credentials, host directory pickers and agent-preset
+  authoring too. Behind a relay the only gate is the relay's own
+  `privilegedMethods` policy, and this unauthenticated LAN path has none. See
+  [../docs/COMPATIBILITY.md](../docs/COMPATIBILITY.md).
 - **Revert**: delete the patch row and restart to return to loopback-only.
 - **Same device**: to drive a harness running on the phone itself (e.g. via
   Termux) or via `adb reverse tcp:3080 tcp:3080`, just connect to
